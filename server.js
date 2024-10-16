@@ -12,9 +12,6 @@ const AwardRoutr=require('./routes/awardsRoute')
 const OtherRouter=require('./routes/otherRoutes')
 
 
-
-
-
 const cors = require('cors');
 const AuthRoutes = require('./routes/authRoutes');
 // Load environment variables
@@ -47,10 +44,13 @@ app.use(cors());
 
 
 
-
 // Connect to MongoDB
 mongoose.connect(mongoURI)
-  .then(() => console.log('Connected to MongoDB'))
+  .then(() => console.log('Connected to MongoDB')
+
+
+)
+  
   .catch(err => console.log('Failed to connect to MongoDB', err));
 
 // Use user routes

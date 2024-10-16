@@ -1,12 +1,12 @@
 const express = require('express');
 const router = express.Router();
 const ResearchProject = require('../models/researchprojects'); // Import the ResearchProject model
-const ResearchCover = require('../models/researchcover'); // Import the ResearchCover model
-const cloudinary = require('./config/cloudinaryConfig'); // Import Cloudinary config
-const upload = require('./config/multerConfig'); // Import multer config
+const ResearchCover= require('../models/researchcover');
+const cloudinary = require('../cloudinaryConfig'); // Import your Cloudinary config
+const upload = require('../multerConfig'); // Import multer config
 const fs = require('fs'); // Import file system module
 
-// Upload and update cover image
+
 router.put('/cover', upload.single('coverImg'), async (req, res) => {
   try {
     if (!req.file) {
@@ -22,22 +22,23 @@ router.put('/cover', upload.single('coverImg'), async (req, res) => {
 
     console.log('Cloudinary upload result:', result); // Log Cloudinary result
 
-    // Delete local file
     fs.unlink(req.file.path, (err) => {
       if (err) {
         console.error('Error deleting file:', err);
-      } else {
-        console.log('File deleted successfully');
       }
     });
 
     let coverImage = await ResearchCover.findOne();
+
     if (coverImage) {
       coverImage.url = result.secure_url;
       const updatedCoverImage = await coverImage.save();
       res.status(200).json({ message: 'Cover image updated', coverImage: updatedCoverImage });
     } else {
-      const newCoverImage = new ResearchCover({ url: result.secure_url });
+      const newCoverImage = new ResearchCover({
+        url: result.secure_url,
+      });
+
       const createdCoverImage = await newCoverImage.save();
       res.status(201).json({ message: 'Cover image created', coverImage: createdCoverImage });
     }
@@ -47,9 +48,15 @@ router.put('/cover', upload.single('coverImg'), async (req, res) => {
   }
 });
 
-// Fetch cover image
+
+
+
+
+
 router.get('/cover', async (req, res) => {
   try {
+
+    
     const coverImage = await ResearchCover.findOne();
     if (coverImage) {
       res.status(200).json(coverImage);
@@ -62,9 +69,16 @@ router.get('/cover', async (req, res) => {
   }
 });
 
+
+
+
+
+
+
 // Create a new research project
-router.post('/', upload.single('image1'), async (req, res) => {
+router.post('/',upload.single('image1'), async (req, res) => {
   try {
+
     if (!req.file) {
       return res.status(400).json({ error: 'No file uploaded' });
     }
@@ -77,32 +91,44 @@ router.post('/', upload.single('image1'), async (req, res) => {
     });
 
     const project = new ResearchProject(req.body);
-    project.image1 = result.secure_url;
+    project.image1=result.secure_url;
     await project.save();
-
-    // Delete local file
-    fs.unlink(req.file.path, (err) => {
-      if (err) {
-        console.error('Error deleting file:', err);
-      } else {
-        console.log('File deleted successfully');
-      }
-    });
-
     res.status(201).send(project);
   } catch (err) {
-    console.error('Error creating project:', err);
     res.status(400).send(err);
   }
 });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 // Get all research projects
 router.get('/', async (req, res) => {
   try {
     const projects = await ResearchProject.find();
-    res.status(200).send(projects);
+    res.send(projects);
   } catch (err) {
-    console.error('Error fetching projects:', err);
     res.status(500).send(err);
   }
 });
@@ -110,20 +136,24 @@ router.get('/', async (req, res) => {
 // Get a research project by ID
 router.get('/:id', async (req, res) => {
   try {
+    
     const project = await ResearchProject.findById(req.params.id);
     if (!project) {
       return res.status(404).send('Project not found');
     }
-    res.status(200).send(project);
+    res.send(project);
   } catch (err) {
-    console.error('Error fetching project by ID:', err);
     res.status(500).send(err);
   }
 });
 
+
+
+
 // Update a research project by ID
 router.put('/:id', upload.single('image2'), async (req, res) => {
   try {
+
     if (!req.file) {
       return res.status(400).json({ error: 'No file uploaded' });
     }
@@ -134,25 +164,23 @@ router.put('/:id', upload.single('image2'), async (req, res) => {
       resource_type: 'image',
       folder: 'research'
     });
-
-    // Delete local file
     fs.unlink(req.file.path, (err) => {
       if (err) {
         console.error('Error deleting file:', err);
-      } else {
-        console.log('File deleted successfully');
       }
     });
 
-    const updatedFields = { ...req.body, image2: result.secure_url }; // Update image2 field
+
+    const updatedFields = { ...req.body, image1: result.secure_url }; // Update image1 field
+
     const project = await ResearchProject.findByIdAndUpdate(req.params.id, updatedFields, { new: true });
 
+    
     if (!project) {
       return res.status(404).send('Project not found');
     }
-    res.status(200).send(project);
+    res.send(project);
   } catch (err) {
-    console.error('Error updating project:', err);
     res.status(400).send(err);
   }
 });
@@ -164,19 +192,20 @@ router.delete('/:id', async (req, res) => {
     if (!project) {
       return res.status(404).send('Project not found');
     }
-
-    // If the project had an image in Cloudinary, you can delete it as well
-    if (project.image1) {
-      const publicId = project.image1.split('/').pop().split('.')[0]; // Extract public ID from URL
-      await cloudinary.uploader.destroy(`research/${publicId}`);
-      console.log('Image deleted from Cloudinary');
-    }
-
-    res.status(200).send('Project deleted');
+    res.send('Project deleted');
   } catch (err) {
-    console.error('Error deleting project:', err);
     res.status(500).send(err);
   }
 });
+
+
+
+
+
+
+
+
+
+
 
 module.exports = router;

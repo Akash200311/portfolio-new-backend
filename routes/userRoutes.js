@@ -1,8 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const User = require('../models/user'); // Import your user model
-const cloudinary = require('./config/cloudinaryConfig'); // Import your Cloudinary config
-const upload = require('./config/multerConfig'); // Import multer config
+const cloudinary = require('../cloudinaryConfig'); // Import your Cloudinary config
+const upload = require('../multerConfig'); // Import multer config
 const fs = require('fs'); // Import file system module
 
 // Create a new user (only if no user exists)

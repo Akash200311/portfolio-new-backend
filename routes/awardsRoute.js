@@ -1,8 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const Awards = require('../models/awards');
-const cloudinary = require('./config/cloudinaryConfig'); // Cloudinary config
-const upload = require('./config/multerConfig'); // Multer config
+const cloudinary = require('../cloudinaryConfig'); // Cloudinary config
+const upload = require('../multerConfig'); // Multer config
 const fs = require('fs'); // File system module
 
 // Route to get all awards
